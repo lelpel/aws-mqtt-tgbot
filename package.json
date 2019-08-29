@@ -1,0 +1,21 @@
+{
+  "name": "awsbot",
+  "version": "1.0.0",
+  "description": "AWS MQTT Telegram bot",
+  "main": "bot.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "aws"
+  ],
+  "author": "lelpel",
+  "license": "MIT",
+  "dependencies": {
+    "aws-mqtt": "^1.0.0",
+    "aws-sdk": "^2.519.0",
+    "eslint": "^6.2.2",
+    "telegraf": "^3.32.0",
+    "ws": "^7.1.2"
+  }
+}
