@@ -7,23 +7,16 @@ const { credentials, endpoint, clientId, will } = config;
 
 const bot = new Telegraf(process.env.TOKEN);
 
-const aws = new AWSHelper(
-  credentials,
-  credentials.region,
-  endpoint,
-  clientId,
-  will,
-  (topic, message) => {
-    Telegraf.reply(`Topic: ${topic}, message: ${message}`);
-  }
-);
+const aws = new AWSHelper((topic, message) => {
+  Telegraf.reply(`Topic: ${topic}, message: ${message}`);
+});
 
 bot.start(({ reply, message }) => {
   reply(`Hello, ${message.from.username}`);
 });
 
 bot.on("message", ctx => {
-  aws.publish(ctx.message, "test3");
+  aws.publishLambda(ctx.message);
 });
 // bot.hears("restart", ({ reply, message }) => {
 //   reply(`Hello, ${message.from.username}`);
