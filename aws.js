@@ -4,12 +4,7 @@ const config = require("./config");
 const publishMessage = require("aws-mqtt/lib/publishMessage");
 class AWSHelper {
   constructor(onMessage) {
-    // Initialize the Amazon Cognito credentials provider
     AWS.config.loadFromPath("./c2.json");
-    // AWS.config.region = config.aws.region;
-    // AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-    //   IdentityPoolId: config.aws.cognito.identityPoolId
-    // });
 
     this.client = new AWSMqttClient({
       region: AWS.config.region,
@@ -18,12 +13,10 @@ class AWSHelper {
       clientId: "mqtt-client-" + Math.floor(Math.random() * 100000 + 1)
     });
 
-    console.log("DIDIT");
-
     this.client.on("connect", () => {
       console.log("connected");
       this.subscribe();
-      this.publish("Тупое говно тупого говна");
+      this.publish();
     });
 
     this.client.on("message", (topic, message) => {
@@ -33,7 +26,6 @@ class AWSHelper {
 
   publish(message = "Hello world", topic = config.topics.test) {
     this.client.publish(topic, message);
-    console.log("Success (simple)");
   }
 
   publishLambda(message = "Hello world", topic = config.topics.test) {
