@@ -2,8 +2,7 @@ const Telegraf = require("telegraf");
 require("dotenv").config();
 const AWSHelper = require("./aws");
 
-const config = require("./config.json");
-const { credentials, endpoint, clientId, will } = config;
+const config = require("./config.js");
 
 const bot = new Telegraf(process.env.TOKEN);
 
@@ -16,14 +15,28 @@ bot.start(({ reply, message }) => {
 });
 
 bot.on("message", ctx => {
-  aws.publishLambda(ctx.message);
+  Telegraf.reply(ctx.message);
+  console.log(ctx.message);
+  aws.publish(ctx.message.text, "test");
 });
-// bot.hears("restart", ({ reply, message }) => {
-//   reply(`Hello, ${message.from.username}`);
-// });
 
-bot.command("subscribe", ({ reply }) => {
-  aws.subscribe("test3", () => reply("Ошибка при подписке"));
+bot.hears("sub", ({ reply }) => {
+  console.log("tries subscribe from bot");
+  reply("tries sub");
+  aws.subscribe(config.test.topic, () => reply("Ошибка при подписке"));
+  console.log("subscribed from bot");
+  reply("subbd");
+});
+bot.hears("restart", ({ reply, message }) => {
+  reply(`Hello, ${message.from.username}`);
+});
+
+bot.command("sub", ({ reply }) => {
+  console.log("tries subscribe from bot");
+  reply("tries sub");
+  aws.subscribe(config.test.topic, () => reply("Ошибка при подписке"));
+  console.log("subscribed from bot");
+  reply("subbd");
 });
 
 bot.command("get", Telegraf.reply("Ну нажал ты кнопку дальше что"));

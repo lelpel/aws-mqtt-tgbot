@@ -1,10 +1,10 @@
 const AWS = require("aws-sdk");
 const AWSMqttClient = require("aws-mqtt/lib/NodeClient");
 const config = require("./config");
-const publishMessage = require("aws-mqtt/lib/publishMessage");
+
 class AWSHelper {
   constructor(onMessage) {
-    AWS.config.loadFromPath("./c2.json");
+    AWS.config.loadFromPath("./credentials.json");
 
     this.client = new AWSMqttClient({
       region: AWS.config.region,
@@ -20,28 +20,17 @@ class AWSHelper {
     });
 
     this.client.on("message", (topic, message) => {
+      onMessage();
       console.log(`Topic = ${topic}, message = ${message}`);
     });
   }
 
-  publish(message = "Hello world", topic = config.topics.test) {
+  publish(message = config.test.message, topic = config.topics.test) {
     this.client.publish(topic, message);
   }
 
-  publishLambda(message = "Hello world", topic = config.topics.test) {
-    publishMessage(
-      {
-        region: AWS.config.region,
-        endpoint: config.aws.iot.endpoint,
-        credentials: AWS.config.credentials
-      },
-      topic,
-      message
-    ).then(() => console.log("Success"), console.error);
-  }
   subscribe(topic = config.topics.test, errorCb = undefined) {
     this.client.subscribe(topic, errorCb);
-    console.log(`Subscribed to a topic ${topic}`);
   }
 }
 
