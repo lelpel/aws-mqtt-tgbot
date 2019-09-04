@@ -20,16 +20,16 @@ bot.on("message", ctx => {
   aws.publish(ctx.message.text, "test");
 });
 
-bot.hears("sub", ({ reply }) => {
-  console.log("tries subscribe from bot");
-  reply("tries sub");
-  aws.subscribe(config.test.topic, () => reply("Ошибка при подписке"));
-  console.log("subscribed from bot");
-  reply("subbd");
-});
-bot.hears("restart", ({ reply, message }) => {
-  reply(`Hello, ${message.from.username}`);
-});
+// bot.hears("sub", ({ reply }) => {
+//   console.log("tries subscribe from bot");
+//   reply("tries sub");
+//   aws.subscribe(config.test.topic, () => reply("Ошибка при подписке"));
+//   console.log("subscribed from bot");
+//   reply("subbd");
+// });
+// bot.hears("restart", ({ reply, message }) => {
+//   reply(`Hello, ${message.from.username}`);
+// });
 
 bot.command("sub", ({ reply }) => {
   console.log("tries subscribe from bot");
@@ -39,6 +39,6 @@ bot.command("sub", ({ reply }) => {
   reply("subbd");
 });
 
-bot.command("get", Telegraf.reply("Ну нажал ты кнопку дальше что"));
+bot.command("get", Telegraf.reply("Кнопка нажата"));
 
 bot.launch();
