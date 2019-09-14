@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const AWSHelper = require("./aws");
+const AwsMqtt = require("./aws");
 
 const Telegraf = require("telegraf");
 const commandParts = require("telegraf-command-parts");
@@ -9,7 +9,7 @@ bot.use(commandParts());
 
 let chatId;
 
-const aws = new AWSHelper((topic, message) => {
+const aws = new AwsMqtt((topic, message) => {
   console.log(message);
   console.log(`Topic: ${topic}, message: ${message}`);
   bot.telegram.sendMessage(chatId, `Topic: ${topic}, message: ${message}`);

@@ -2,7 +2,7 @@ const AWS = require("aws-sdk");
 const AWSMqttClient = require("aws-mqtt/lib/NodeClient");
 const config = require("./config");
 
-class AWSHelper {
+class AwsMqtt {
   constructor(onMessage) {
     AWS.config.loadFromPath("./credentials.json");
 
@@ -34,4 +34,4 @@ class AWSHelper {
   }
 }
 
-module.exports = AWSHelper;
+module.exports = AwsMqtt;
