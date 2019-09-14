@@ -20,7 +20,7 @@ class AWSHelper {
     });
 
     this.client.on("message", (topic, message) => {
-      onMessage();
+      onMessage(topic, message);
       console.log(`Topic = ${topic}, message = ${message}`);
     });
   }
