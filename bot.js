@@ -1,38 +1,47 @@
-const Telegraf = require("telegraf");
 require("dotenv").config();
-const AWSHelper = require("./aws");
 
-const config = require("./config.json");
-const { credentials, endpoint, clientId, will } = config;
+const AwsMqttClient = require("./aws");
 
-const bot = new Telegraf(process.env.TOKEN);
+const Telegraf = require("telegraf");
+const commandParts = require("telegraf-command-parts");
+const bot = new Telegraf(process.env.TOKEN2);
+bot.use(commandParts());
 
-const aws = new AWSHelper(
-  credentials,
-  credentials.region,
-  endpoint,
-  clientId,
-  will,
-  (topic, message) => {
-    Telegraf.reply(`Topic: ${topic}, message: ${message}`);
-  }
-);
+let chatId;
+
+const aws = new AwsMqttClient((topic, message) => {
+  console.log(message);
+  console.log(`Topic: ${topic}, message: ${message}`);
+  bot.telegram.sendMessage(chatId, `Topic: ${topic}, message: ${message}`);
+});
 
 bot.start(({ reply, message }) => {
   reply(`Hello, ${message.from.username}`);
 });
 
-bot.on("message", ctx => {
-  aws.publish(ctx.message, "test3");
-});
-// bot.hears("restart", ({ reply, message }) => {
-//   reply(`Hello, ${message.from.username}`);
-// });
+bot.command("sub", ({ reply, state, message }) => {
+  const args = state.command.splitArgs;
+  const topic = args
+    ? state.command.splitArgs.join(" ")
+    : require("./config").test.topic;
 
-bot.command("subscribe", ({ reply }) => {
-  aws.subscribe("test3", () => reply("Ошибка при подписке"));
+  aws.subscribe(topic, (error, granted) =>
+    granted
+      ? reply(`Successfully subscribed to topic ${topic}`)
+      : reply(`Error subscribing to topic ${topic}, errmsg: ${error}`)
+  );
+
+  chatId = message.chat.id;
 });
 
-bot.command("get", Telegraf.reply("Ну нажал ты кнопку дальше что"));
+bot.command("send", ({ reply, state }) => {
+  const [topic, message] = state.command.args.split(";");
+  aws.publish(message, topic);
+  reply(`Sent. Topic ${topic}, message: ${message}`);
+});
+
+bot.command("heartbeat", ({ reply, message }) => {
+  reply(`Hello, ${message.from.username}`);
+});
 
 bot.launch();

@@ -1,50 +1,37 @@
 const AWS = require("aws-sdk");
 const AWSMqttClient = require("aws-mqtt/lib/NodeClient");
+const config = require("./config");
 
-// const credentials = AWS.config.loadFromPath("./config.json");
-// AWS.config.region = { credentials };
-// AWS.config.credentials = credentials;
+class AwsMqttClient {
+  constructor(onMessage) {
+    AWS.config.loadFromPath("./credentials.json");
 
-class AWSHelper {
-  constructor(credentials, region, endpoint, clientId, will, onMessage) {
-    console.log(credentials);
-    const cobj = {
-      IdentityPoolId: credentials.poolId
-    };
-    console.log(cobj);
-    console.log(region);
     this.client = new AWSMqttClient({
-      region,
-      credentials: new AWS.CognitoIdentityCredentials({
-        IdentityPoolId: credentials.poolId
-      }),
-      endpoint,
-      clientId,
-      will
+      region: AWS.config.region,
+      credentials: AWS.config.credentials,
+      endpoint: config.aws.iot.endpoint,
+      clientId: "mqtt-client-" + Math.floor(Math.random() * 100000 + 1)
     });
 
-    // AWS.config.region = { credentials };
-    // AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-    //   IdentityPoolId: credentials.poolId
-    // });
-    this.client.on("message", onMessage);
+    this.client.on("connect", () => {
+      console.log("connected");
+      this.subscribe();
+      this.publish();
+    });
+
+    this.client.on("message", (topic, message) => {
+      onMessage(topic, message);
+      console.log(`Topic = ${topic}, message = ${message}`);
+    });
   }
 
-  publish(message, topic) {
+  publish(message = config.test.message, topic = config.topics.test) {
     this.client.publish(topic, message);
   }
 
-  subscribe(topic, errorCb) {
-    this.client.subscribe(topic, errorCb);
+  subscribe(topic = config.topics.test, cb = undefined) {
+    this.client.subscribe(topic, cb);
   }
 }
 
-module.exports = AWSHelper;
-
-// : "mqtt-client-" + Math.floor(Math.random() * 100000 + 1),
-// {
-//         topic: "WillMsg",
-//         payload: "Connection Closed abnormally..!",
-//         qos: 0,
-//         retain: false
-//       }
+module.exports = AwsMqttClient;
