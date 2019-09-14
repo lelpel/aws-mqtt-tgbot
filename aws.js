@@ -29,8 +29,8 @@ class AWSHelper {
     this.client.publish(topic, message);
   }
 
-  subscribe(topic = config.topics.test, errorCb = undefined) {
-    this.client.subscribe(topic, errorCb);
+  subscribe(topic = config.topics.test, cb = undefined) {
+    this.client.subscribe(topic, cb);
   }
 }
 
